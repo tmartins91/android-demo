@@ -1,0 +1,53 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id "dagger.hilt.android.plugin"
+    id 'kotlin-kapt'
+}
+
+android {
+
+    buildTypes {
+        debug {
+            debuggable true
+            minifyEnabled false
+            testCoverageEnabled false
+            versionNameSuffix "-debug"
+            applicationIdSuffix ".debug"
+        }
+
+        release {
+            debuggable false
+            minifyEnabled true
+            testCoverageEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation project(':core-network')
+    implementation project(':core-resources')
+    implementation project(':feature-currencies')
+
+
+    implementation "androidx.navigation:navigation-runtime-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+
+    // AndroidX
+    implementation "androidx.appcompat:appcompat:$appcompat_version"
+    implementation "androidx.startup:startup-runtime:$startup_version"
+    implementation "androidx.lifecycle:lifecycle-process:$lifecycle_runtime_version"
+
+    // Image Loading Library
+    implementation "io.coil-kt:coil:$coil_version"
+
+    // Dependency Injection
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+
+    // Network
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+}

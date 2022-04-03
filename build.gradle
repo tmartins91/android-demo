@@ -1,0 +1,112 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+
+    apply from: 'dependencies.gradle'
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:$gradle_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10"
+        classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
+    }
+
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+
+    tasks.withType(Test).configureEach {
+        // Disabling tests cacheability https://github.com/gradle/gradle/issues/9151
+        outputs.upToDateWhen { false }
+        testLogging {
+            events = ["failed", "skipped", "passed"]
+            exceptionFormat "full"
+        }
+    }
+
+    plugins.withId("com.android.library") {
+        android {
+            sourceSets {
+                androidTest.java.srcDirs += "src/androidTest/kotlin"
+                debug.java.srcDirs += "src/debug/kotlin"
+                main.java.srcDirs += "src/main/kotlin"
+                test.java.srcDirs += "src/test/kotlin"
+            }
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_1_8
+                targetCompatibility JavaVersion.VERSION_1_8
+            }
+            compileSdkVersion compile_sdk_version
+
+            buildTypes {
+                qa {
+                    matchingFallbacks = ['debug']
+                }
+            }
+
+            defaultConfig {
+                minSdkVersion min_sdk_version
+                targetSdkVersion target_sdk_version
+                versionCode app_version_code
+                versionName app_version_name
+
+                testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+                consumerProguardFiles "consumer-rules.pro"
+            }
+
+            buildFeatures {
+                viewBinding project.name.startsWith("feature-") || project.name.contains("core-design")
+            }
+        }
+    }
+
+    plugins.withId("com.android.application") {
+        android {
+            sourceSets {
+                androidTest.java.srcDirs += "src/androidTest/kotlin"
+                debug.java.srcDirs += "src/debug/kotlin"
+                main.java.srcDirs += "src/main/kotlin"
+                test.java.srcDirs += "src/test/kotlin"
+            }
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_1_8
+                targetCompatibility JavaVersion.VERSION_1_8
+            }
+            compileSdkVersion compile_sdk_version
+            defaultConfig {
+                minSdkVersion min_sdk_version
+                targetSdkVersion target_sdk_version
+                versionCode app_version_code
+                versionName app_version_name
+
+                testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+                consumerProguardFiles "consumer-rules.pro"
+            }
+            buildFeatures {
+                viewBinding true
+            }
+        }
+    }
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+
+        kotlinOptions {
+            jvmTarget = '1.8'
+            freeCompilerArgs += '-Xexplicit-api=strict'
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
